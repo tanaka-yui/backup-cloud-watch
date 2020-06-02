@@ -1,0 +1,48 @@
+service:
+  name: backup-cloud-watch
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+  - serverless-offline-scheduler
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: ap-northeast-1
+  role: 'set your aws lambda execution role arn.'
+  stage: ${opt:stage, self:custom.defaultStage}
+  logRetentionInDays: 14
+
+custom:
+  defaultStage: dev
+  http:
+    dev:
+      private: false
+    stg:
+      private: true
+    prd:
+      private: true
+  environment:
+    dev:
+      SLS_DEBUG: '*'
+      BUCKET_NAME: 'set your bucket name'
+      LOG_GROUP_NAMES: 'set your cloudWatch LogGroups. comma delimiter'
+    stg:
+      BUCKET_NAME: 'set your bucket name'
+      LOG_GROUP_NAMES: 'set your cloudWatch LogGroups. comma delimiter'
+    prd:
+      BUCKET_NAME: 'set your bucket name'
+      LOG_GROUP_NAMES: 'set your cloudWatch LogGroups. comma delimiter'
+
+functions:
+  backup:
+    handler: handler.index
+    environment: ${self:custom.environment.${self:provider.stage}}
+    events:
+       # 毎週月曜日(2)の10:00 (CRONはUTCで記載)
+       - schedule: cron(0 1 ? * MON *)
+#       - http:
+#           path: exec
+#           method: GET
+#           private: ${self:custom.http.${self:provider.stage}.private}

@@ -1,1 +1,17 @@
-# backup-cloudwatch
+# backup-cloud-watch
+
+## setup
+```shell script
+$ brew install yarn
+$ npm install -g serverless
+```
+
+local test
+```shell script
+$ yarn run dev 
+```
+
+deploy
+```shell script
+$ yarn run deploy
+```
